@@ -15,9 +15,6 @@ def get_input(filename):
     return output
 
 
-def main():
+if __name__ == '__main__':
     data = get_input('input.txt')
     print(max([sum(group) for group in data]))
-    
-
-main()

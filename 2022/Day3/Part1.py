@@ -15,13 +15,10 @@ def get_score(letter: str):
         return ord(letter) - ord('A') + 27
 
 
-def main():
+if __name__ == '__main__':
     rucksacks = get_input('input.txt')
     total = 0
     for compartment_1, compartment_2 in rucksacks:
         shared = list(compartment_1.intersection(compartment_2))[0]
         total += get_score(shared)
     print(total)
-
-
-main()

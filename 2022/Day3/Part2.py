@@ -17,13 +17,10 @@ def get_score(letter: str):
         return ord(letter) - ord('A') + 27
 
 
-def main():
+if __name__ == '__main__':
     groups = get_input('input.txt')
     total = 0
     for a, b, c in groups:
         shared = list(a.intersection(b).intersection(c))[0]
         total += get_score(shared)
     print(total)
-
-
-main()
