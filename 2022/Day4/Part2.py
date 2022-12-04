@@ -1,26 +1,29 @@
 
-
 def get_input(filename):
     with open(filename) as file:
         lines = file.read().splitlines()
-    groups = []
-    for ii in range(0, len(lines), 3):
-        group = [set(line) for line in lines[ii:ii + 3]]
-        groups.append(group)
-    return groups
+    pairs = []
+    for line in lines:
+        pair_1, pair_2 = line.split(',')
+        pair_1 = [int(value) for value in pair_1.split('-')]
+        pair_2 = [int(value) for value in pair_2.split('-')]
+        pairs.append([pair_1, pair_2])
+    return pairs
 
 
-def get_score(letter: str):
-    if letter.islower():
-        return ord(letter) - ord('a') + 1
-    else:
-        return ord(letter) - ord('A') + 27
+def is_valid(set_1, set_2):
+    return len(set(set_1).intersection(set(set_2))) > 0
 
 
-if __name__ == '__main__':
-    groups = get_input('input.txt')
-    total = 0
-    for a, b, c in groups:
-        shared = list(a.intersection(b).intersection(c))[0]
-        total += get_score(shared)
-    print(total)
+def main():
+    pairs = get_input('input.txt')
+    count = 0
+    for set_1, set_2 in pairs:
+        valid = is_valid(list(range(set_1[0], set_1[1] + 1)), list(range(set_2[0], set_2[1] + 1)))
+        # print(set_1, set_2, valid)
+        if valid:
+            count += 1
+    print(count)
+
+
+main()

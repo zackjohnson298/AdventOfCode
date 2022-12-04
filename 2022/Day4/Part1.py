@@ -2,23 +2,26 @@
 def get_input(filename):
     with open(filename) as file:
         lines = file.read().splitlines()
-    compartment_1 = [set(line[:int(len(line) / 2)]) for line in lines]
-    compartment_2 = [set(line[int(len(line) / 2):]) for line in lines]
-    rucksacks = zip(compartment_1, compartment_2)
-    return rucksacks
+    pairs = []
+    for line in lines:
+        pair_1, pair_2 = line.split(',')
+        pair_1 = [int(value) for value in pair_1.split('-')]
+        pair_2 = [int(value) for value in pair_2.split('-')]
+        pairs.append([pair_1, pair_2])
+    return pairs
 
 
-def get_score(letter: str):
-    if letter.islower():
-        return ord(letter) - ord('a') + 1
-    else:
-        return ord(letter) - ord('A') + 27
+def is_valid(set_1, set_2):
+    return (set_1[0] <= set_2[0] and set_1[1] >= set_2[1]) or (set_2[0] <= set_1[0] and set_2[1] >= set_1[1])
 
 
-if __name__ == '__main__':
-    rucksacks = get_input('input.txt')
-    total = 0
-    for compartment_1, compartment_2 in rucksacks:
-        shared = list(compartment_1.intersection(compartment_2))[0]
-        total += get_score(shared)
-    print(total)
+def main():
+    pairs = get_input('input.txt')
+    count = 0
+    for set_1, set_2 in pairs:
+        if is_valid(set_1, set_2):
+            count += 1
+    print(count)
+
+
+main()
