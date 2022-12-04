@@ -14,6 +14,9 @@ def get_input(filename):
     return output
 
 
-if __name__ == '__main__':
+def main():
     data = get_input('input.txt')
     print(sum(sorted([sum(group) for group in data])[-3:]))
+
+
+main()

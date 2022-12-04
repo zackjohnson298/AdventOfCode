@@ -44,7 +44,7 @@ def evaluate(their_move, desired_outcome):
     return score
 
 
-if __name__ == '__main__':
+def main():
     their_moves, outcomes = get_input('input.txt')
     total = 0
     for their_move, desired_outcome in zip(their_moves, outcomes):
@@ -53,3 +53,6 @@ if __name__ == '__main__':
         total += score
     print()
     print(total)
+
+
+main()
