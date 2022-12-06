@@ -8,16 +8,16 @@ def get_input(filename):
     instructions = []
     for line in lines:
         if '[' in line:
-            ii = 1
-            pos = 1
-            while pos < len(line):
-                if line[pos] != ' ':
-                    if ii in stacks:
-                        stacks[ii].append(line[pos])
+            stack_number = 1
+            string_index = 1
+            while string_index < len(line):
+                if line[string_index] != ' ':
+                    if stack_number in stacks:
+                        stacks[stack_number].append(line[string_index])
                     else:
-                        stacks[ii] = [line[pos]]
-                ii += 1
-                pos += 4
+                        stacks[stack_number] = [line[string_index]]
+                stack_number += 1
+                string_index += 4
         elif 'move' in line:
             lst = line.split()
             instructions.append([int(lst[1]), int(lst[3]), int(lst[5])])
