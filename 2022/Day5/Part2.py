@@ -26,10 +26,11 @@ def get_input(filename):
 
 def main():
     stacks, instructions = get_input('input.txt')
-    for number, stack_a, stack_b in instructions:
-        crates_to_move = []
-        for _ in range(number):
-            crates_to_move.append(stacks[stack_a].pop(0))
+    for index, (number, stack_a, stack_b) in enumerate(instructions):
+        # if index % 1000 == 0:
+        #     print(index, len(instructions))
+        crates_to_move = stacks[stack_a][:number]
+        del stacks[stack_a][:number]
         stacks[stack_b] = crates_to_move + stacks[stack_b]
     code = ''
     for stack in sorted(stacks):

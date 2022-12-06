@@ -27,10 +27,12 @@ def get_input(filename):
 def main():
     stacks, instructions = get_input('input.txt')
     for number, stack_a, stack_b in instructions:
-        crates_to_move = []
-        for _ in range(number):
-            crates_to_move.insert(0, stacks[stack_a].pop(0))
-        stacks[stack_b] = crates_to_move + stacks[stack_b]
+        crates_to_move = reversed(stacks[stack_a][:number])
+        del stacks[stack_a][:number]
+        stacks[stack_b] = list(crates_to_move) + stacks[stack_b]
+        # for _ in range(number):
+        #     crates_to_move.insert(0, stacks[stack_a].pop(0))
+        # stacks[stack_b] = crates_to_move + stacks[stack_b]
     code = ''
     for stack in sorted(stacks):
         code = code + stacks[stack][0]
