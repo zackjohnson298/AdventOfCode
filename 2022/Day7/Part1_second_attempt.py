@@ -30,17 +30,13 @@ def get_input(filename):
 
 def main():
     sizes = get_input('input.txt')
+    for key, value in sizes.items():
+        print(key, value)
     total = 0
-    used_space = sizes[('/',)]
-    total_space = 70000000
-    desired_space = 30000000
-    unused_space = total_space - used_space
-    space_to_free = desired_space - unused_space
-    for size in sorted(sizes.values()):
-        if size > space_to_free:
-            print(size)
-            break
-    # print(total)
+    for size in sizes.values():
+        if size <= 100000:
+            total += size
+    print(total)
 
 
 main()

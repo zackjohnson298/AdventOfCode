@@ -6,7 +6,6 @@ def get_input(filename):
         lines = file.read().splitlines()
     tree = {'/': {}}
     current_path = ['/']
-    state = 'adding files'
     for line in lines:
         if '$' in line:
             if ' cd ' in line:      # This is suspicious. If I check for ls instead it no longer works (key error at vmvpf)
@@ -29,31 +28,35 @@ def get_input(filename):
     return tree
 
 
-def get_size(tree, sizes):
+def get_size(tree, sizes, current_path):
     total = 0
     for name, value in tree.items():
         if type(value) == int:
             total += value
         else:
-            new_value = get_size(value, sizes)
+            new_path = current_path + [name]
+            new_value = get_size(value, sizes, new_path)
             total += new_value
-            if name in sizes:
-                sizes[name] += new_value
+            key = tuple(new_path)
+            if key in sizes:
+                sizes[key] += new_value
             else:
-                sizes[name] = new_value
+                sizes[key] = new_value
     return total
 
 
 def main():
     tree = get_input('input.txt')
     print(json.dumps(tree, indent=4))
-    sizes = {'/': 0}
-    get_size(tree, sizes)
-    print(json.dumps(sizes, indent=4))
+    sizes = {('/',): 0}
+    current_path = ['/']
+    get_size(tree, sizes, current_path)
+    # print(json.dumps(sizes, indent=4))
     total = 0
     for key, value in sizes.items():
         if value <= 100000:
             total += value
     print(total)
+
 
 main()
