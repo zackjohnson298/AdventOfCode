@@ -7,11 +7,13 @@ def get_input(filename):
     tree = {'/': {}}
     current_path = ['/']
     state = 'adding files'
-    for line in lines[2:]:
+    for line in lines:
         if '$' in line:
             if ' cd ' in line:      # This is suspicious. If I check for ls instead it no longer works (key error at vmvpf)
                 if '..' in line:
                     current_path.pop()
+                elif '/' in line:
+                    current_path = ['/']
                 else:
                     current_path.append(line.split()[-1])
         else:
