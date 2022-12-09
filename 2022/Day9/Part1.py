@@ -5,58 +5,51 @@ import numpy as np
 def get_input(filename):
     with open(filename) as file:
         lines = file.read().splitlines()
-    grid = np.array([[int(value) for value in line] for line in lines])
-    return grid
+    instructions = []
+    for line in lines:
+        a, b = line.split()
+        instructions.append([a, int(b)])
+    return instructions
 
 
-def get_visible_edges(grid):
-    rows, cols = grid.shape
-    visible_trees = [[0, col] for col in range(cols)]
-    visible_trees.extend([[rows - 1, col] for col in range(cols)])
-    visible_trees.extend([[row, 0] for row in range(1, rows-1)])
-    visible_trees.extend([[row, cols - 1] for row in range(1, rows-1)])
-    return visible_trees
+def update_tail_pos(head_pos, tail_pos):
+    diff = head_pos - tail_pos
+    if (np.abs(diff) <= np.array([1, 1])).all():
+        return tail_pos
+    if diff[0] == 0:
+        if diff[1] > 0:
+            tail_pos += np.array([0, 1])
+        else:
+            tail_pos += np.array([0, -1])
+    elif diff[1] == 0:
+        if diff[0] > 0:
+            tail_pos += np.array([1, 0])
+        else:
+            tail_pos += np.array([-1, 0])
+    else:
+        diff = np.array([int(diff[0]/abs(diff[0])), int(diff[1]/abs(diff[1]))])
+        tail_pos += diff
+    return tail_pos
 
 
 def main():
-    grid = get_input('input.txt')
-    rows, cols = grid.shape
-    visible_trees = get_visible_edges(grid)
-    print('edges', visible_trees, len(visible_trees))
-    # Down
-    for row in range(1, rows-1):
-        for col in range(1, cols-1):
-            if [row, col] not in visible_trees:
-                sub_col = grid[:row+1, col].tolist()
-                if grid[row, col] == max(grid[:row+1, col]) and sub_col.count(grid[row, col]) == 1:
-                    visible_trees.append([row, col])
-    print('down ', visible_trees)
-    # Up
-    for row in reversed(range(1, rows - 1)):
-        for col in range(1, cols - 1):
-            if [row, col] not in visible_trees:
-                sub_col = grid[row:, col].tolist()
-                if grid[row, col] == max(sub_col) and sub_col.count(grid[row, col]) == 1:
-                    visible_trees.append([row, col])
-    print('up   ', visible_trees)
-    # Left
-    for col in range(1, cols - 1):
-        for row in range(1, rows - 1):
-            if [row, col] not in visible_trees:
-                sub_row = grid[row, :col+1].tolist()
-                if grid[row, col] == max(sub_row) and sub_row.count(grid[row, col]) == 1:
-                    visible_trees.append([row, col])
-    print('left ', visible_trees)
-    # Right
-    for row in range(1, rows - 1):
-        for col in reversed(range(1, cols - 1)):
-            if [row, col] not in visible_trees:
-                sub_row = grid[row, col:].tolist()
-                if grid[row, col] == max(sub_row) and sub_row.count(grid[row, col]) == 1:
-                    visible_trees.append([row, col])
-    print('right', visible_trees)
-    print()
-    print(len(visible_trees))
+    instructions = get_input('input.txt')
+    directions = {
+        'U': np.array([0, 1]),
+        'D': np.array([0, -1]),
+        'L': np.array([-1, 0]),
+        'R': np.array([1, 0])
+    }
+    head_pos = np.array([0, 0])
+    tail_pos = np.array([0, 0])
+    visited = [tuple(tail_pos)]
+    for direction, value in instructions:
+        for step in range(value):
+            head_pos += directions[direction]
+            tail_pos = update_tail_pos(head_pos, tail_pos)
+            if tuple(tail_pos) not in visited:
+                visited.append(tuple(tail_pos))
+    print(len(visited))
 
 
 main()
