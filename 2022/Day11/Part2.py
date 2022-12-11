@@ -1,9 +1,5 @@
 import json
 
-'''
-INCOMPLETE
-'''
-
 
 def get_input(filename):
     with open(filename) as file:
@@ -16,7 +12,7 @@ def get_input(filename):
             monkey = {'count': 0}
             monkeys[int(lst[1][:-1])] = monkey
         elif (ii - 1) % 7 == 0:
-            items = [int(value) for value in line.split(': ')[1].split(', ')]
+            items = [int(value) for value in line.split(': ')[1].split(', ') if value.isdigit()]
             monkey['items'] = items
         elif (ii - 2) % 7 == 0:
             a = line.split('= ')[1]
@@ -40,9 +36,17 @@ def get_input(filename):
     return monkeys
 
 
+def find_lcm(monkeys):
+    lcm = 1
+    for value in [monkey['test']['value'] for monkey in monkeys.values()]:
+        lcm *= value
+    return lcm
+
+
 def main():
-    monkeys = get_input('test_input.txt')
+    monkeys = get_input('input.txt')
     turns = 10000
+    lcm = find_lcm(monkeys)
     for turn in range(turns):
         for monkey_key, monkey in sorted(monkeys.items()):
             for ii, item in enumerate(monkey['items']):
@@ -58,12 +62,13 @@ def main():
                     next_monkey = monkey['test'][True]
                 else:
                     next_monkey = monkey['test'][False]
-                monkeys[next_monkey]['items'].append(monkey['items'][ii])
+                monkeys[next_monkey]['items'].append(monkey['items'][ii] % lcm)
             monkey['items'] = []
         print(f'Round {turn}:')
         for key, monkey in sorted(monkeys.items()):
             print(key, monkey['items'])
-        _ = input()
+        print()
+        # _ = input()
     print('Counts:')
     for key, monkey in sorted(monkeys.items()):
         print(key, monkey['count'])

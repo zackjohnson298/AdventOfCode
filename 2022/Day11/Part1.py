@@ -37,7 +37,7 @@ def get_input(filename):
 
 
 def main():
-    monkeys = get_input('input.txt')
+    monkeys = get_input('test_input.txt')
     turns = 20
     for turn in range(turns):
         for monkey_key, monkey in sorted(monkeys.items()):
