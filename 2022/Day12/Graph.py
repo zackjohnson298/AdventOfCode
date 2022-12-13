@@ -1,4 +1,5 @@
 import numpy as np
+from PriorityQueue import PriorityQueue
 
 
 class Graph:
@@ -11,6 +12,11 @@ class Graph:
         if 0 <= r < self.rows and 0 <= c < self.cols:
             return self.grid[r, c]
         return None
+
+    def set_value(self, point, value):
+        r, c = point
+        if 0 <= r < self.rows and 0 <= c < self.cols:
+            self.grid[r, c] = value
 
     def neighbors(self, point):
         neighbors = []
@@ -32,8 +38,38 @@ class Graph:
         current_value = ord(self.grid[current])
         next_value = ord(self.grid[next_pos])
         if next_value - current_value > 1:
-            return 100000
+            return 1000000000
         elif next_value - current_value == 1:
             return 1
         else:
-            return 20
+            return 1
+
+    def find_path_A_star(self, start, goal):
+
+        def heuristic(desired, pos):
+            # return 0
+            return abs(desired[0] - pos[0]) + abs(desired[1] - pos[1])
+
+        frontier = PriorityQueue()
+        frontier.put(start, 0)
+        came_from = {start: None}
+        cost_so_far = {start: 0}
+
+        while not frontier.empty():
+            current = frontier.get()
+            if current == goal:
+                break
+            for next_pos in self.neighbors(current):
+                new_cost = cost_so_far[current] + self.cost(current, next_pos)
+                if next_pos not in cost_so_far or new_cost < cost_so_far[next_pos]:
+                    cost_so_far[next_pos] = new_cost
+                    priority = new_cost + heuristic(goal, next_pos)
+                    frontier.put(next_pos, priority)
+                    came_from[next_pos] = current
+
+        path = []
+        current = goal
+        while current != start:
+            path.insert(0, current)
+            current = came_from[current]
+        return path
