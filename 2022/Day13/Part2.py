@@ -1,11 +1,10 @@
 import json
-import ast
 
 
 def get_input(filename):
     with open(filename) as file:
         lines = file.read().splitlines()
-    array = [ast.literal_eval(line) for line in lines if len(line) > 0]
+    array = [json.loads(line) for line in lines if len(line) > 0]
     return array
 
 

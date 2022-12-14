@@ -1,4 +1,4 @@
-import ast
+import json
 
 
 def get_input(filename):
@@ -8,7 +8,7 @@ def get_input(filename):
     pair = []
     for line in lines:
         if len(line):
-            pair.append(ast.literal_eval(line))
+            pair.append(json.loads(line))
         else:
             pairs.append(pair)
             pair = []
