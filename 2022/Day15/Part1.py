@@ -1,5 +1,3 @@
-import numpy as np
-
 
 def get_input(filename):
     with open(filename) as file:
@@ -22,15 +20,11 @@ def get_input(filename):
     return sensors, beacons
 
 
-def get_row_width(sensors: list, beacons: list):
-    min_x = float('inf')
-    max_x = -float('inf')
-    for x, _ in sensors + beacons:
-        if x < min_x:
-            min_x = x
-        elif x > max_x:
-            max_x = x
-    return min_x, max_x
+def get_row_width(sensors_with_distances):
+    left_extremes = [sensor[0] - distance for sensor, distance in sensors_with_distances.items()]
+    right_extremes = [sensor[0] + distance for sensor, distance in sensors_with_distances.items()]
+
+    return min(left_extremes), max(right_extremes)
 
 
 def get_distance(p1, p2):
@@ -38,19 +32,20 @@ def get_distance(p1, p2):
 
 
 def main():
-    sensors, beacons = get_input('test_input.txt')
-    min_x, max_x = get_row_width(sensors, beacons)
-    sensors_with_distance = [(sensor, get_distance(sensor, beacon)) for sensor, beacon in zip(sensors, beacons)]
+    sensors, beacons = get_input('input.txt')
+    sensors_with_distance = {sensor: get_distance(sensor, beacon) for sensor, beacon in zip(sensors, beacons)}
+    min_x, max_x = get_row_width(sensors_with_distance)
     total = 0
-    y = 10 #2000000
-    for x in range(min_x, max_x + 1):
+    y = 2000000
+    print(min_x, max_x)
+    for x in range(min_x, max_x):
         pos = (x, y)
-        print((x-min_x)/(max_x - min_x))
-        for sensor, min_distance in sensors_with_distance:
+        print(round(100*(x-min_x)/(max_x - min_x), 3), '%')
+        for sensor, min_distance in sensors_with_distance.items():
             if get_distance(pos, sensor) <= min_distance and pos not in beacons:
                 total += 1
                 break
     print(total)
-    # print(get_row_width(sensors))
+
 
 main()
