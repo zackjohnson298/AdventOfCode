@@ -86,13 +86,13 @@ def add_grain(grid, current=(500, 0)):
 
 
 def main():
-    paths = get_input('input.txt')
+    paths = get_input('test_input.txt')
     grid = create_grid(paths)
     can_continue = True
     while can_continue:
         can_continue = add_grain(grid)
-        # print_grid(grid[492:505, 0:10])
-        # _ = input(f'{sum(sum(grid == 2))} {is_valid}: ')
+        print_grid(grid[492:505, 0:10])
+        _ = input(f'{sum(sum(grid == 2))} {can_continue}: ')
     print(sum(sum(grid == 2)))
 
 
