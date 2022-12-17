@@ -101,16 +101,15 @@ def traverse2(overlaps, current_scanner, destination, path=[]):
             return new_path
 
 
-def fill_transforms(scanners, overlaps, path, transforms=None):
-    if transforms is None:
-        transforms = {scanner_id: {} for scanner_id in scanners}
+def get_transforms(scanners, overlaps, path):
+    transform = {scanner_id: {} for scanner_id in scanners}
     for index in range(1, len(path)):
         scanner_a_id = path[index-1]
         scanner_b_id = path[index]
         scanner_a = scanners[scanner_a_id]
         scanner_b = scanners[scanner_b_id]
-        transforms[scanner_a_id][scanner_b_id] = {'rotation': None, 'translation': None}
-        print(index, scanner_a_id, scanner_b_id)
+        transform[scanner_a_id][scanner_b_id] = {'rotation': None, 'translation': None}
+        # print(index, scanner_a_id, scanner_b_id)
         aa_r_k_fixed = overlaps[scanner_a_id][scanner_b_id]
         bb_r_k_fixed = overlaps[scanner_b_id][scanner_a_id]
         for r_index, a_T_b in enumerate(rotations):
@@ -149,8 +148,34 @@ def main():
             destination = scanner_id
             path = traverse2(overlaps, starting_scanner, destination, path=[starting_scanner])
             paths[destination] = path
-    for scanner_id, path in paths.items():
-        print(scanner_id, path, validate_path(path, overlaps))
+            print(scanner_id, path)
+    transforms = {}
+    print('FINDING TRANSFORMS')
+    for ii, path in enumerate(paths.values()):
+        print(f'{ii}/{len(paths)}')
+        t = get_transforms(scanners, overlaps, path)
+        transforms[tuple(path)] = t
+
+    all_points = [tuple(point) for point in scanners[starting_scanner]['beacons']]
+    print('MAPPING POINTS')
+    for ii, (path, transform_dict) in enumerate(transforms.items()):
+        print(f'{ii}/{len(paths)}')
+        T = np.identity(3, dtype='int')
+        p = np.array((0, 0, 0), dtype='int').T
+        for index in range(1, len(path)):
+            a = path[index - 1]
+            b = path[index]
+            t = transform_dict[a][b]
+            a_T_b = t['rotation']
+            aa_r_b = t['translation']
+            p += T @ aa_r_b
+            T = T @ a_T_b
+        mapped_points = [tuple(T @ point + p) for point in scanners[path[-1]]['beacons']]
+        all_points += [point for point in mapped_points if point not in all_points]
+    print()
+    print(len(all_points))
+
+
     # valid = validate_path(path, overlaps)
     # print(valid, path)
     # print(len(set(path)) == len(overlaps))
@@ -169,11 +194,6 @@ def main():
     # oo_r_1 = transform[0][1]['translation']
     # for beacon in scanners[1]['beacons']:
     #     print(o_T_1@beacon + oo_r_1)
-    # for scanner_a_id, trans in transform.items():
-    #     print(scanner_a_id)
-    #     for key, value in trans.items():
-    #         print(f'\t{key}: {value}')
-    #     print()
     # _ = input()
 
 main()
