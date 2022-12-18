@@ -130,14 +130,14 @@ def main():
                 direction = 'v'
             else:
                 direction = jets[jet_index]
-                jet_index += 1
-                if jet_index == len(jets):
-                    jet_index = 0
+                jet_index = (jet_index + 1) % len(jets)
             if can_move(grid, current_rock, rock_x, rock_y, direction):
-                if direction == 'v':
-                    rock_y += 1
+                if direction == '>':
+                    rock_x += 1
+                elif direction == '<':
+                    rock_x -= 1
                 else:
-                    rock_x += 1 if direction == '>' else -1
+                    rock_y += 1
             elif direction == 'v':
                 done = True
                 for r in range(rock_height):
