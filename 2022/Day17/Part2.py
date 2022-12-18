@@ -93,18 +93,6 @@ def print_grid(grid, rock, rock_x, rock_y):
     print()
 
 
-def trim_grid(grid, min_width=1):
-    grid_height, grid_width = grid.shape
-    # trim_index = grid_height
-    sums = sum(grid.T).tolist()
-    if grid_width in sums:
-        trim_index = sums.index(grid_width)
-        new_grid = grid[:trim_index+1, :grid_width]
-        new_grid[-1, :] = np.ones((1, grid_width))
-        return new_grid, grid_height - trim_index - 1
-    return grid, 0
-
-
 def get_profile(grid: np.array):
     profile = [None]*grid.shape[1]
     depth = 0
@@ -122,28 +110,19 @@ def main():
     jets = get_input('input.txt')
     rocks = get_rocks()
     jet_index = 0
-    # _ = input(len(jets))
-    rock_count = 0
     max_rock_count = 1000000000000
     grid = np.ones((1, 7), dtype='bool')
-    total_trimmed = 0
     state_list = []
     state_value_list = []
-    current_state_value = {}
-    last_state_value = {}
-    loop_state = ()
+    second_occurrence_state_value = {}
+    first_occurrence_state_value = {}
     for rock_count in range(max_rock_count):
-        # if rock_count % 100 == 0:
-        print(rock_count, max_rock_count)
+        print(f'Iteration {rock_count + 1} / {max_rock_count}')
         current_rock = rocks[rock_count % len(rocks) + 1]
         grid = get_new_grid(grid, current_rock)
-        grid, trimmed = trim_grid(grid)
-        total_trimmed += trimmed
         rock_height, rock_width = current_rock.shape
         rock_y = -1
         rock_x = 2
-        # print_grid(grid, current_rock, rock_x, rock_y+1)
-        # _ = input()
         done = False
         tick = 0
         while not done:
@@ -171,32 +150,46 @@ def main():
             state_list.append(state)
             state_value_list.append({
                 'rock_count': rock_count,
-                'height': grid.shape[0] - find_top_index(grid) - 1 + total_trimmed
+                'height': grid.shape[0] - find_top_index(grid) - 1
             })
         else:
-            print(f'Loop Found!: {state}')
-            loop_state = state
-            last_state_value = state_value_list[state_list.index(state)]
-            current_state_value = {
+            print()
+            print(f'Loop Found!')
+            print(f'\t  Profile: {state[0]}')
+            print(f'\tNext Rock: {state[1]}')
+            print(f'\tJet Index: {state[2]}')
+            first_occurrence_state_value = state_value_list[state_list.index(state)]
+            second_occurrence_state_value = {
                 'rock_count': rock_count,
-                'height': grid.shape[0] - find_top_index(grid) - 1 + total_trimmed
+                'height': grid.shape[0] - find_top_index(grid) - 1
             }
             break
-    period = current_state_value['rock_count'] - last_state_value['rock_count']
-    offset = last_state_value['rock_count']
-    current_rock_count = offset
-    # print(offset, period)
-    n = floor(((max_rock_count - offset)/period))
-    count_difference = max_rock_count - n*period + offset
-    subtracted_height = state_value_list[state_list.index(loop_state) - count_difference]['height']
-    # print(state_value_list[state_list.index(loop_state) - count_difference]['height'])
-    height_gained_in_period = current_state_value['height'] - last_state_value['height']
-    # print(n*period + offset)
-    print((n+1)*height_gained_in_period + last_state_value['height'] - subtracted_height - 1)
 
-    # print(grid.shape[0] - find_top_index(grid) - 1 + total_trimmed)
-    # print()
-    # print_grid(grid[:20, :], np.array([[]]), 0, 0)
+    # Loop Found, determine period and offset values
+    first_occurrence_rock_count = first_occurrence_state_value['rock_count']
+    rock_count_period = second_occurrence_state_value['rock_count'] - first_occurrence_rock_count
+
+    # Find integer N such that first_rock_count + N*period < desired_rock_count < first_rock_count + (N+1)*period
+    N = floor((max_rock_count - first_occurrence_rock_count) / rock_count_period)
+    delta_rock_count = max_rock_count - first_occurrence_rock_count - N * rock_count_period
+
+    print()
+    print(f'N = {N}')
+    print(f'Count Period = {rock_count_period}')
+    print(f'First Count = {first_occurrence_rock_count}')
+    print(f'Delta Count = {delta_rock_count}')
+
+    height_at_first_occurrence = first_occurrence_state_value['height']
+    height_period = second_occurrence_state_value['height'] - height_at_first_occurrence
+    # Define Starting Height such that starting_height + N * height_period = Desired_height
+    starting_height = state_value_list[first_occurrence_rock_count + delta_rock_count]['height']
+
+    print(f'Height Period = {height_period}')
+    print(f'Starting Height = {starting_height}')
+    print()
+
+    height = N * height_period + starting_height - 1
+    print(height)
 
 
 main()
