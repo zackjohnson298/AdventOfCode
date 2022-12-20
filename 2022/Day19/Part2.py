@@ -88,7 +88,7 @@ def simulate(blueprint: {}, minutes=24) -> int:
 
 
 def main():
-    blueprints = get_input('test_input.txt')
+    blueprints = get_input('input.txt')
     max_geodes_1, count = get_max_geodes(blueprints[1], minutes=32, iterations=100000)
     print('1: ', max_geodes_1, count)
     max_geodes_2, count = get_max_geodes(blueprints[2], minutes=32, iterations=100000)
