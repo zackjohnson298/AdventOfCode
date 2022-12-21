@@ -37,7 +37,6 @@ def find_value(monkeys, monkey_name):
     return evaluate(children_values, monkey['op'])
 
 
-
 def get_path(monkeys, desired_monkey, path_so_far):
     monkey = monkeys[path_so_far[-1]]
     if desired_monkey in monkey['children']:
