@@ -32,7 +32,7 @@ def evaluate(values: [int, int], op: str):
     if op == '*':
         return a * b
     if op == '/':
-        return a / b
+        return int(a / b)
     return None
 
 
@@ -51,7 +51,7 @@ def find_value(monkeys, monkey_name):
 
 def main():
     monkeys = get_input('input.txt')
-    print(int(find_value(monkeys, 'root')))
+    print(find_value(monkeys, 'root'))
 
 
 main()
