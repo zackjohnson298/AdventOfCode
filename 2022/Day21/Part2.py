@@ -25,28 +25,17 @@ def get_input(filename):
 
 def evaluate(values: [int, int], op: str):
     a, b = values
-    if op == '+':
-        return a + b
-    if op == '-':
-        return a - b
-    if op == '*':
-        return a * b
-    if op == '/':
-        return int(a / b)
-    return None
+    string = f'{a} {op} {b}'
+    return int(eval(string))
 
 
 def find_value(monkeys, monkey_name):
     monkey = monkeys[monkey_name]
     if monkey['value'] is not None:
         return monkey['value']
-    children_values = []
-    if len(monkey['children']) == 0:
-        raise ValueError(f'Error with monkey {monkey_name}')
-    for child_name in monkey['children']:
-        child_value = find_value(monkeys, child_name)
-        children_values.append(child_value)
+    children_values = [find_value(monkeys, child_name) for child_name in monkey['children']]
     return evaluate(children_values, monkey['op'])
+
 
 
 def get_path(monkeys, desired_monkey, path_so_far):
