@@ -86,18 +86,13 @@ def determine_segment(grid, pos: (int, int), segment_size):
     return 6
 
 
-def get_next_pos(grid, pos, direction, file='actual'):
+def get_next_pos(grid, pos, direction, size=50):
     next_pos = tuple(np.array(pos) + DIRECTIONS[direction]['vector'])
     _ = grid.shape
     next_direction = direction
     rows, cols = grid.shape
-    blocked = False
     if next_pos[0] < 0 or next_pos[1] < 0 or next_pos[0] >= rows or next_pos[1] >= cols or grid[next_pos] == 2:
-        size = int(cols/3)
-        if file == 'actual':
-            current_segment = determine_segment(grid, pos, size)
-        else:
-            current_segment = determine_segment(grid, pos, size)
+        current_segment = determine_segment(grid, pos, size)
         if current_segment == 1:
             # print(1)
             if direction == 'left': #(direction == np.array((0, -1))).all():
@@ -136,7 +131,7 @@ def get_next_pos(grid, pos, direction, file='actual'):
             # print(4)
             if direction == 'up': # '(direction == np.array((-1, 0))).all():
                 # print('up to 3')
-                next_pos = (pos[1]+5, size)
+                next_pos = (pos[1]+size, size)
                 next_direction = 'right' # np.array((0, 1)).T
             elif direction == 'left': # '(direction == np.array((0, -1))).all():
                 # print('left to 1')
@@ -166,12 +161,12 @@ def get_next_pos(grid, pos, direction, file='actual'):
                 # print('left to 1')
                 next_pos = (0, pos[0] - 2*size)
                 next_direction = 'down' # np.array((1, 0)).T
-    elif grid[next_pos] == 0:
-        return next_pos, direction, blocked
-    if grid[next_pos] == 1:
-        blocked = True
-        return pos, direction, blocked
-    return next_pos, next_direction, blocked
+    # elif grid[next_pos] == 0:
+    #     return next_pos, direction, blocked
+    # if grid[next_pos] == 1:
+    #     blocked = True
+    #     return pos, direction, blocked
+    return next_pos, next_direction
 
 
 def draw_grid(grid):
@@ -199,7 +194,7 @@ def get_facing(direction):
     return None
 
 
-def validate():
+def validate_test():
     grid, steps = get_input('test_input_2.txt')
 
     # print(get_next_pos(grid, (0, 14), 'right'))
@@ -281,6 +276,67 @@ def validate():
                 print(f'\tPass: {state} -> {output}')
 
 
+def validate_actual():
+    grid, steps = get_input('input.txt')
+
+    print(get_next_pos(grid, (100, 0), 'up'))
+    print()
+    print('Running Validation...')
+    expected = {
+        ((0, 149), 'right'): ((149, 99), 'left'),
+        ((49, 149), 'right'): ((100, 99), 'left'),
+
+        ((50, 99), 'right'): ((49, 100), 'up'),
+        ((99, 99), 'right'): ((49, 149), 'up'),
+
+        ((100, 99), 'right'): ((49, 149), 'left'),
+        ((149, 99), 'right'): ((0, 149), 'left'),
+
+        ((150, 49), 'right'): ((149, 50), 'up'),
+        ((199, 49), 'right'): ((149, 99), 'up'),
+
+        ((0, 50), 'left'): ((149, 0), 'right'),
+        ((49, 50), 'left'): ((100, 0), 'right'),
+
+        ((50, 50), 'left'): ((100, 0), 'down'),
+        ((99, 50), 'left'): ((100, 49), 'down'),
+
+        ((100, 0), 'left'): ((49, 50), 'right'),
+        ((149, 0), 'left'): ((0, 50), 'right'),
+
+        ((150, 0), 'left'): ((0, 50), 'down'),
+        ((199, 0), 'left'): ((0, 99), 'down'),
+
+        ((100, 0), 'up'): ((50, 50), 'right'),
+        ((100, 49), 'up'): ((99, 50), 'right'),
+
+        ((0, 50), 'up'): ((150, 0), 'right'),
+        ((0, 99), 'up'): ((199, 0), 'right'),
+
+        ((0, 100), 'up'): ((199, 0), 'up'),
+        ((0, 149), 'up'): ((199, 49), 'up'),
+
+        ((199, 0), 'down'): ((0, 100), 'down'),
+        ((199, 49), 'down'): ((0, 149), 'down'),
+
+        ((149, 50), 'down'): ((150, 49), 'left'),
+        ((149, 99), 'down'): ((199, 49), 'left'),
+
+        ((49, 100), 'down'): ((50, 99), 'left'),
+        ((49, 149), 'down'): ((99, 99), 'left'),
+    }
+    for state, expected_output in expected.items():
+        pos = state[0]
+        direction = state[1]
+        output = get_next_pos(grid, pos, direction)
+        if output != expected_output:
+            print(f'\tFailed')
+            print(f'\t\t   Input: {state}')
+            print(f'\t\tExpected: {expected_output}')
+            print(f'\t\t  Actual: {output}')
+            return
+        else:
+            print(f'\tPass: {state} -> {output}')
 
 
 def main():
@@ -298,9 +354,11 @@ def main():
     for step in steps:
         if type(step) == int:
             for _ in range(step):
-                pos, direction, blocked = get_next_pos(grid, pos, direction)
-                if blocked:
+                next_pos, next_direction = get_next_pos(grid, pos, direction)
+                if grid[next_pos] == 1:
+                    print('stuck')
                     break
+                pos, direction = next_pos, next_direction
                 # print(pos, direction)
         elif step in 'LR':
             direction = DIRECTIONS[direction][step] #rot_z(-90) @ direction
@@ -313,5 +371,5 @@ def main():
     print(1000*a + 4*b + facing)
 
 
-# validate()
+# validate_actual()
 main()
