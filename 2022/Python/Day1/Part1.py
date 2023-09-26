@@ -16,7 +16,7 @@ def get_input(filename):
 
 
 def main():
-    data = get_input('input.txt')
+    data = get_input('Python/Day1/input.txt')
     print(max([sum(group) for group in data]))
 
 

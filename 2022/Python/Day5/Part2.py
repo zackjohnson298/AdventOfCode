@@ -25,10 +25,10 @@ def get_input(filename):
 
 
 def main():
-    stacks, instructions = get_input('input.txt')
+    stacks, instructions = get_input('aoc_2022_day05_large_input.txt')
     for index, (number, stack_a, stack_b) in enumerate(instructions):
-        # if index % 1000 == 0:
-        #     print(index, len(instructions))
+        if index % 1000 == 0:
+            print(index, len(instructions))
         crates_to_move = stacks[stack_a][:number]
         del stacks[stack_a][:number]
         stacks[stack_b] = crates_to_move + stacks[stack_b]
