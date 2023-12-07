@@ -123,14 +123,7 @@ def get_input(filename) -> List[Hand]:
 
 def main():
     hands = get_input('input.txt')
-    hands_by_strength = {strength: [] for strength in range(1, 8)}
-    for hand in hands:
-        hands_by_strength[hand.strength].append(hand)
-    sorted_hands = []
-    for strength, hands_list in hands_by_strength.items():
-        new_list = sorted(hands_list)
-        sorted_hands.extend(new_list)
-    print(sum([ii*hand.bid for ii, hand in enumerate(sorted_hands, start=1)]))
+    print(sum([ii*hand.bid for ii, hand in enumerate(sorted(hands), start=1)]))
 
 
 main()
