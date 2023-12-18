@@ -74,7 +74,6 @@ class Grid:
         self.width = len(lines[0])
         self.beams: List[Beam] = [Beam((0, -1), (0, 1), self.height, self.width)]
         self.history: List[Tuple[Tuple[int, int], Tuple[int, int]]] = []
-        self.stuck_beams: List[Beam] = []
         self.energized_points: Set[Tuple[int, int]] = set()
         self.mirrors: Dict[Tuple[int, int], Mirror] = {}
         self.splitters: Dict[Tuple[int, int], Splitter] = {}
@@ -89,7 +88,6 @@ class Grid:
 
     def update(self):
         new_beams: List[Beam] = []
-        stuck_beams = []
         beams_to_remove = []
         for beam in self.beams:
             if beam.move():
@@ -108,10 +106,9 @@ class Grid:
                 else:
                     self.history.append((beam.pos, beam.direction))
             else:
-                stuck_beams.append(beam)
-        for beam in stuck_beams + beams_to_remove:
+                beams_to_remove.append(beam)
+        for beam in beams_to_remove:
             self.beams.remove(beam)
-        self.stuck_beams.extend(stuck_beams)
         self.beams.extend(new_beams)
 
     def print(self):

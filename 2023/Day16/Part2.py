@@ -76,7 +76,6 @@ class Grid:
         r, c = starting_pos
         self.beams: List[Beam] = [Beam((r-dr, c-dc), direction, self.height, self.width)]
         self.history: List[Tuple[Tuple[int, int], Tuple[int, int]]] = []
-        self.stuck_beams: List[Beam] = []
         self.energized_points: Set[Tuple[int, int]] = set()
         self.mirrors: Dict[Tuple[int, int], Mirror] = {}
         self.splitters: Dict[Tuple[int, int], Splitter] = {}
@@ -91,7 +90,6 @@ class Grid:
 
     def update(self):
         new_beams: List[Beam] = []
-        stuck_beams = []
         beams_to_remove = []
         for beam in self.beams:
             if beam.move():
@@ -110,10 +108,9 @@ class Grid:
                 else:
                     self.history.append((beam.pos, beam.direction))
             else:
-                stuck_beams.append(beam)
-        for beam in stuck_beams + beams_to_remove:
+                beams_to_remove.append(beam)
+        for beam in beams_to_remove:
             self.beams.remove(beam)
-        self.stuck_beams.extend(stuck_beams)
         self.beams.extend(new_beams)
 
     def print(self):
@@ -154,11 +151,11 @@ def main():
     max_score = -1
     for direction, (rows, cols) in options.items():
         for ii, (r, c) in enumerate(zip(rows, cols)):
-            print(direction, ii, (r, c), (height, width))
             grid = Grid(lines, (r, c), direction)
             while grid.beams:
                 grid.update()
             score = len(grid.energized_points)
+            print(direction, ii, (r, c), (height, width), score)
             if score > max_score:
                 max_score = score
     print(max_score)
