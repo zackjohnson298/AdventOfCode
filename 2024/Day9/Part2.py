@@ -25,20 +25,20 @@ def get_input(filename: str) -> List[int]:
         return [int(char) for char in file.readline()]
 
 
-def generate(disk_map: List[int]) -> Tuple[List[Block], List[Block]]:
+def generate(disk_map: List[int]) -> Tuple[Dict[int, Block], Dict[int, Block]]:
     file_id = 0
-    blocks = []
-    spaces = []
+    blocks = {}
+    spaces = {}
     free_space = False
     position = 0
     disk_map = [value for value in disk_map]
     while disk_map:
         value = disk_map.pop(0)
         if free_space:
-            spaces.append(Block(None, position, value))
+            spaces[position] = Block(None, position, value)
             free_space = False
         else:
-            blocks.append(Block(file_id, position, value))
+            blocks[position] = Block(file_id, position, value)
             file_id += 1
             free_space = True
         position += value
@@ -48,45 +48,28 @@ def generate(disk_map: List[int]) -> Tuple[List[Block], List[Block]]:
 def main():
     disk_map = get_input('input.txt')
     blocks, spaces = generate(disk_map)
-    for ii, block in enumerate(reversed(blocks)):
-        if ii % 100 == 0:
+    space_positions = list(spaces)
+    for ii, block in enumerate(reversed(blocks.values())):
+        if ii % 1000 == 0:
             print(ii, len(blocks))
-        new_space = None
-        blank_space = None
-        for space in spaces:
-            if space.position >= block.position:
+        for space_pos in space_positions:
+            if space_pos >= block.position:
                 break
+            space = spaces[space_pos]
             if space.could_fit(block):
                 new_space = Block(None, block.position, block.size)
+                spaces[new_space.position] = new_space
                 block.position = space.position
                 space.size -= block.size
                 space.position += block.size
-                if space.size == 0:
-                    blank_space = space
+                spaces.pop(space_pos)
+                if space.size:
+                    spaces[space.position] = space
+                space_positions = sorted(spaces)
                 break
-        if blank_space:
-            spaces.remove(blank_space)
-        if new_space:
-            spaces.append(new_space)
-            spaces = sorted(spaces, key=lambda s: s.position)
             # all_items = sorted(blocks + spaces, key=lambda b: b.position)
             # print(''.join(block.to_str() for block in all_items))
-    print(sum([block.checksum for block in blocks]))
-    # print(spaces)
+    print(sum([block.checksum for block in blocks.values()]))
 
-    # end = None
-    # while None in disk_map:
-    #     # print(''.join((str(value) if value is not None else '.') for value in disk_map))
-    #     index = disk_map.index(None)
-    #     end = disk_map.pop()
-    #     print(index, len(disk_map))
-    #     if index >= len(disk_map):
-    #         break
-    #     disk_map[index] = end
-    #     while disk_map[-1] is None:
-    #         disk_map.pop()
-    # print(''.join((str(value) if value is not None else '.') for value in disk_map))
-    # print(sum([ii*value for ii, value in enumerate(disk_map)]))
-    # print(line)
 
 main()
